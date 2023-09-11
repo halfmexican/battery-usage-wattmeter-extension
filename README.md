@@ -18,6 +18,6 @@ If you encounter any issues or have suggestions for improvements, please feel fr
 
 ## Credits
 
-This extension is maintained by Jose H, with inspiration from the original [batt_consumption_wattmeter](https://github.com/wennaspeedy/batt_consumption_wattmeter) project.
+This extension is maintained by Jose H, with inspiration from the original [batt_consumption_wattmeter](https://github.com/wennaspeedy/batt_consumption_wattmetter) project.
 
 ---
