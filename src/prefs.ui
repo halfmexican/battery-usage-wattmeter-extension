@@ -1,0 +1,119 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkBox" id="prefs_box">
+    <property name="orientation">vertical</property>
+    <child>
+      <object class="AdwHeaderBar">
+        <property name="centering-policy">strict</property>
+        <property name="title-widget">
+          <object class="AdwViewSwitcherTitle" id="switcher_title">
+            <property name="stack">stack</property>
+            <property name="title" translatable="true">Battery Usage Wattmeter</property>
+          </object>
+        </property>
+      </object>
+    </child>
+    <child>
+      <object class="AdwViewStack" id="stack">
+        <property name="vexpand">true</property>
+        <child>
+          <object class="AdwViewStackPage" id="page1">
+            <property name="name">page1</property>
+            <property name="title" translatable="true">Settings</property>
+            <property name="icon-name">settings-symbolic</property>
+            <property name="use-underline">true</property>
+            <property name="child">
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="valign">center</property>
+                <property name="spacing">12</property>
+                <child>
+                  <object class="AdwClamp">
+                    <property name="maximum-size">600</property>
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="true">Behavior</property>
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="true">Sync Interval</property>
+                            <property name="subtitle" translatable="true">Seconds</property>
+                            <property name="activatable-widget">
+                              <object class="GtkSpinButton">
+                                <property name="adjustment">
+                                  <object class="GtkAdjustment" id="interval_adjustment">
+                                    <property name="value">4</property>
+                                    <property name="upper">120</property>
+                                    <property name="lower">1</property>
+                                  </object>
+                                </property>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwActionRow" id="battery_row">
+                            <property name="title" translatable="true">Battery Selection</property>
+                            <property name="activatable-widget">
+                              <object class="GtkDropDown" id="battery">
+                                <property name="model">
+                                  <object class="GtkStringList" id="bat_list">
+                                    <items>
+                                      <item>Automatic</item>
+                                      <item>BAT0</item>
+                                      <item>BAT1</item>
+                                      <item>BAT2</item>
+                                    </items>
+                                  </object>
+                                </property>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwViewStackPage" id="page2">
+            <property name="name">page2</property>
+            <property name="title" translatable="true">About</property>
+            <property name="icon-name">about-symbolic</property>
+            <property name="use-underline">true</property>
+            <property name="child">
+              <object class="AdwStatusPage">
+                <property name="title" bind-source="page2" bind-property="title" bind-flags="sync-create"/>
+                <property name="icon-name" bind-source="page2" bind-property="icon-name" bind-flags="sync-create"/>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="valign">center</property>
+                    <child>
+                      <object class="GtkListBox">
+                        <style>
+                          <class name="boxed-list"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwViewSwitcherBar" id="switcher_bar">
+        <property name="stack">stack</property>
+        <property name="reveal" bind-source="switcher_title" bind-property="title-visible" bind-flags="sync-create"/>
+      </object>
+    </child>
+  </object>
+</interface>
+
