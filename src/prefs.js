@@ -7,13 +7,12 @@ import * as Utils from './utils.js';
 
 export default class MyExtensionPreferences extends ExtensionPreferences {
   fillPreferencesWindow(window) {
-    this._settings = this.getSettings();
+    this._settings = this.getSettings('org.gnome.shell.extensions.battery_usage_wattmeter');
     this.builder = new Gtk.Builder();
-    this.builder.set_translation_domain(this.metadata['gettext-domain']);
+    //this.builder.set_translation_domain(this.metadata['gettext-domain']);
     this.builder.add_from_file(this.path + '/prefs.ui');
-    const main = this.builder.get_object('prefs_box');
-
-    window.append(main);
+    const page1 = this.builder.get_object('page1');
+    window.add(page1);
     this._bindSettings();
   }
 
@@ -25,4 +24,3 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
     this._settings.bind('battery', this.builder.get_object('battery'), 'active', Gio.SettingsBindFlags.DEFAULT);
   }
 }
-
