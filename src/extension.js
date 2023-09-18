@@ -1,5 +1,5 @@
 import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
-import * as Panel from 'resource:///org/gnome/shell/ui/main.js';
+import {panel, wm}from 'resource:///org/gnome/shell/ui/main.js';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
@@ -11,9 +11,8 @@ const BAT1 = "/sys/class/power_supply/BAT1/";
 const BAT2 = "/sys/class/power_supply/BAT2/";
 
 let BatteryInfo = null;
-
 function getBatteryIndicator(callback) {
-    let system = Panel.statusArea.quickSettings._system;
+    let system = panel.statusArea.quickSettings._system;
     if (system && system._systemItem._powerToggle) {
         callback(system._systemItem._powerToggle._proxy, system);
     }
@@ -45,13 +44,12 @@ function readFileSafely(filePath, defaultValue) {
 // Indicator class
 var BatLabelIndicator = GObject.registerClass(
   class BatLabelIndicator extends St.Label {
-    _init() {
+    _init(settings) {
       super._init({
         text: _('Calculating...'),
         y_align: Clutter.ActorAlign.CENTER
       });
-      
-      this._settings = this.getSettings('org.gnome.shell.extensions.battery_usage_wattmeter');
+        this._settings = settings;
       let battery = this._settings.get_int("battery");
       BatteryInfo = getBatteryPath(battery);
       this._spawn();
@@ -116,12 +114,13 @@ var BatLabelIndicator = GObject.registerClass(
 );
 
 // Main extension class
-export default class MyGNOME45Extension extends Extension {
+export default class WattmeterExtension extends Extension {
   enable() {
-    this._batLabelIndicator = new BatLabelIndicator();
-    
+    this._settings = this.getSettings('org.gnome.shell.extensions.battery_usage_wattmeter');
+
+    this._batLabelIndicator = new BatLabelIndicator(this._settings);
     getBatteryIndicator((proxy, icon) => {
-        icon.add_child(batLabelIndicator);
+        icon.add_child(this._batLabelIndicator);
     });
   }
 
