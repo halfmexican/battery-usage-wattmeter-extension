@@ -74,11 +74,16 @@ var BatLabelIndicator = GObject.registerClass(
 
     // Determine battery status and power
     _getBatteryStatus() {
-      const status = readFileSafely(`${BatteryInfo["path"]}status`, "Unknown");
+      const status = readFileSafely(BatteryInfo["path"] + "status", "Unknown");
+
+      if (status.includes('Full')) {
+        return "";  // Don't display anything if battery is full
+      }
+
       return status.includes('Charging') ? _(" +%s W").format(this._meas()) :
-        status.includes('Discharging') ? _(" -%s W").format(this._meas()) :
-        status.includes('Unknown') ? _(" ?") :
-        _(" N/A");
+              status.includes('Discharging') ? _(" -%s W").format(this._meas()) :
+              status.includes('Unknown') ? _(" ?") :
+               _(" N/A");
     }
 
     // Convert power to string with appropriate formatting
@@ -132,3 +137,4 @@ export default class WattmeterExtension extends Extension {
     }
   }
 }
+
