@@ -137,4 +137,3 @@ export default class WattmeterExtension extends Extension {
     }
   }
 }
-
