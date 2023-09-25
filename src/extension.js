@@ -49,7 +49,7 @@ var BatLabelIndicator = GObject.registerClass(
         text: _('Calculating...'),
         y_align: Clutter.ActorAlign.CENTER
       });
-        this._settings = settings;
+      this._settings = settings;
       let battery = this._settings.get_int("battery");
       BatteryInfo = getBatteryPath(battery);
       this._spawn();
@@ -135,5 +135,6 @@ export default class WattmeterExtension extends Extension {
       this._batLabelIndicator.destroy();
       this._batLabelIndicator = null;
     }
+    this._settings = null;
   }
 }
