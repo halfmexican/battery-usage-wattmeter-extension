@@ -2,6 +2,6 @@ var PrefFields = {
     
     INTERVAL  : '4',
     BATTERY: 0,
-    VERSION: 3
+    VERSION: 4
 };
 
