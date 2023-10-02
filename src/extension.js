@@ -46,7 +46,7 @@ var BatLabelIndicator = GObject.registerClass(
   class BatLabelIndicator extends St.Label {
     _init(settings) {
       super._init({
-        text: _('Calculating...'),
+        text: _('Calculating…'),
         y_align: Clutter.ActorAlign.CENTER
       });
       this._settings = settings;
@@ -81,7 +81,7 @@ var BatLabelIndicator = GObject.registerClass(
       }
 
       return status.includes('Charging') ? _(" +%s W").format(this._meas()) :
-              status.includes('Discharging') ? _(" -%s W").format(this._meas()) :
+              status.includes('Discharging') ? _(" −%s W").format(this._meas()) :
               status.includes('Unknown') ? _(" ?") :
                _(" N/A");
     }
