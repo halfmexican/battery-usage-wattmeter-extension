@@ -3,7 +3,7 @@
   "description": " Shows charging/discharging consumption (+/-) in Watt next to battery percentage level.\nDefault sync reload set to 4 seconds.\nNo consumption info when battery is full.\nFork of https://github.com/wennaspeedy/batt_consumption_wattmetter",
   "name": "Battery Usage Wattmeter",
   "shell-version": [
-    "45",
+    "45"
   ],
   "url": "https://github.com/halfmexican/battery-usage-wattmeter-extension",
   "uuid": "battery-usage-wattmeter@halfmexicanhalfamazing.gmail.com",
