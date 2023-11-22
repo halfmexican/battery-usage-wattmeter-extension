@@ -97,7 +97,7 @@ var BatLabelIndicator = GObject.registerClass(
       if (BatteryInfo["path"] !== -1) {
         this.text = this._getBatteryStatus();
       } else {
-        log(`[consumption-extension] can't find battery!!!`);
+        log(`[wattmeter-extension] can't find battery!!!`);
       }
       return GLib.SOURCE_CONTINUE;
     }
@@ -126,6 +126,12 @@ export default class WattmeterExtension extends Extension {
     this._batLabelIndicator = new BatLabelIndicator(this._settings);
     getBatteryIndicator((proxy, icon) => {
         icon.add_child(this._batLabelIndicator);
+    });
+
+    this._settings.connect('changed::battery', () => {
+        let newBatteryValue = this._settings.get_int("battery");
+        BatteryInfo = getBatteryPath(newBatteryValue); 
+        this._batLabelIndicator._sync(); 
     });
   }
 
