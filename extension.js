@@ -14,12 +14,11 @@ let BatteryInfo = null;
 function getBatteryIndicator(callback) {
     let system = panel.statusArea.quickSettings._system;
     if (system && system._systemItem._powerToggle) {
-        let parentObject = system._systemItem._powerToggle.get_parent();
-        callback(parentObject, system);
+      callback(system._systemItem._powerToggle._proxy, system);
     }
 }
 
-// Function to get the appropriate battery path and its type (TP or not)
+// Function to get the appropriate battery path and its type
 function getBatteryPath(battery) {
   let path = BAT0;
   if (battery === 1) path = BAT0;
@@ -32,7 +31,7 @@ function getBatteryPath(battery) {
   return { 'path': finalPath, 'isTP': isTP };
 }
 
-// Safely read a file and return its contents or a default value
+// Read a file and return its contents or a default value
 function readFileSafely(filePath, defaultValue) {
   try {
     return Shell.get_file_contents_utf8_sync(filePath);
@@ -99,7 +98,7 @@ let BatLabelIndicator = GObject.registerClass(
         this.text = this._getBatteryStatus();
       } else {
         console.log(`[wattmeter-extension] can't find battery!!!`);
-        this.text = " ⚠"
+        this.text = " ⚠ "
       }
       return GLib.SOURCE_CONTINUE;
     }
@@ -126,9 +125,8 @@ export default class WattmeterExtension extends Extension {
     this._settings = this.getSettings('org.gnome.shell.extensions.battery_usage_wattmeter');
 
     this._batLabelIndicator = new BatLabelIndicator(this._settings);
-     getBatteryIndicator((proxy, icon) => {
-        let lastIndex = icon.get_n_children();
-        icon.insert_child_at_index(this._batLabelIndicator, lastIndex + 1);
+      getBatteryIndicator((proxy, icon) => {
+        icon.add_child(this._batLabelIndicator);
     });
     this._settings.connect('changed::battery', () => {
         let newBatteryValue = this._settings.get_int("battery");
