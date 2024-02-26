@@ -28,21 +28,39 @@ function getBatteryIndicator(callback, maxRetriesCallback) {
 		});
 		maxRetriesCallback(timeoutId);
 	} else {
-		console.error(`[battery-usage-wattmeter-extension] Failed to find power toggle indicator after ${max_retries} retries.`);
+		console.error(`[wattmeter-extension] Failed to find power toggle indicator after ${max_retries} retries.`);
 	}
 }
 
 // Function to get the appropriate battery path and its type
 function getBatteryPath(battery) {
-	let path = BAT0;
-	if (battery === 1) path = BAT0;
-	if (battery === 2) path = BAT1;
-	if (battery === 3) path = BAT2;
+	// Array of possible battery paths
+	const batteryPaths = [BAT0, BAT1, BAT2];
+	const invalidPath = -1;
 
-	const finalPath = readFileSafely(`${path}status`, "none") === "none" ? -1 : path;
-	const isTP = readFileSafely(`${path}power_now`, "none") === "none" ? false : true;
-
-	return { "path": finalPath, "isTP": isTP };
+	if (battery === 0) { // Automatic setting
+		// Check each path and return the first one that contains a valid status file
+		for (let path of batteryPaths) {
+			if (readFileSafely(`${path}status`, "none") !== "none") {
+				return { "path": path, "isTP": readFileSafely(`${path}power_now`, "none") !== "none" };
+			}
+		}
+		// If none of the paths contain a valid file, return an error or a default path
+		console.error("[wattmeter-extension] No valid battery path found for automatic setting.");
+		return { "path": invalidPath, "isTP": false };
+	} else {
+		// Manual setting
+		let pathIndex = battery - 1;
+		if (pathIndex >= 0 && pathIndex < batteryPaths.length) {
+			let path = batteryPaths[pathIndex];
+			if (readFileSafely(`${path}status`, "none") !== "none") {
+				return { "path": path, "isTP": readFileSafely(`${path}power_now`, "none") !== "none" };
+			}
+		}
+		// If the selected battery path is not valid, return an error
+		console.error(`[wattmeter-extension] No valid battery path found for battery ${battery}.`);
+		return { "path": invalidPath, "isTP": false };
+	}
 }
 
 // Read a file and return its contents or a default value
