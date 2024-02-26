@@ -15,16 +15,20 @@ const max_retries = 5;
 const retry_delay = 2000;
 let BatteryInfo = null;
 
-function getBatteryIndicator(callback) {
+function getBatteryIndicator(callback, maxRetriesCallback) {
 	let system = panel.statusArea?.quickSettings?._system;
 	if (system?._systemItem?._powerToggle) {
 		callback(system._systemItem._powerToggle._proxy, system);
 	} else if (retry_count < max_retries) {
 		retry_count++;
-		GLib.timeout_add(GLib.PRIORITY_DEFAULT, retry_delay, () => {
-			getBatteryIndicator(callback);
+		// Store the timeout ID so it can be removed later
+		let timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, retry_delay, () => {
+			getBatteryIndicator(callback, maxRetriesCallback);
+			// Since the function will be called again, we return false to remove the source
 			return GLib.SOURCE_REMOVE;
 		});
+		// Pass the timeout ID to the maxRetriesCallback so it can be cleared if needed
+		maxRetriesCallback(timeoutId);
 	} else {
 		console.error(`[battery-usage-wattmeter-extension] Failed to find power toggle indicator after ${max_retries} retries.`);
 	}
@@ -142,13 +146,26 @@ let BatLabelIndicator = GObject.registerClass(
 
 // Main extension class
 export default class WattmeterExtension extends Extension {
+	constructor(metadata) {
+		super(metadata);
+		this._batteryIndicatorTimeoutId = null; // Initialize the property for storing the timeout ID
+	}
+
 	enable() {
 		this._settings = this.getSettings("org.gnome.shell.extensions.battery_usage_wattmeter");
 
 		this._batLabelIndicator = new BatLabelIndicator(this._settings);
-		getBatteryIndicator((proxy, icon) => {
-			icon.add_child(this._batLabelIndicator);
-		});
+		getBatteryIndicator(
+			(proxy, icon) => {
+				icon.add_child(this._batLabelIndicator);
+			},
+			(timeoutId) => {
+				if (this._batteryIndicatorTimeoutId) {
+					GLib.source_remove(this._batteryIndicatorTimeoutId);
+				}
+				this._batteryIndicatorTimeoutId = timeoutId;
+			}
+		);
 		this._settings.connect("changed::battery", () => {
 			let newBatteryValue = this._settings.get_int("battery");
 			BatteryInfo = getBatteryPath(newBatteryValue);
@@ -157,6 +174,10 @@ export default class WattmeterExtension extends Extension {
 	}
 
 	disable() {
+		if (this._batteryIndicatorTimeoutId) {
+			GLib.source_remove(this._batteryIndicatorTimeoutId);
+			this._batteryIndicatorTimeoutId = null;
+		}
 		if (this._batLabelIndicator) {
 			this._batLabelIndicator._stop();
 			this._batLabelIndicator.destroy();
@@ -165,3 +186,5 @@ export default class WattmeterExtension extends Extension {
 		this._settings = null;
 	}
 }
+
+
