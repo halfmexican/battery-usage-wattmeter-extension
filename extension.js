@@ -184,5 +184,3 @@ export default class WattmeterExtension extends Extension {
 		this._settings = null;
 	}
 }
-
-
