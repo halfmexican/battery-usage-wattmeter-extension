@@ -24,10 +24,8 @@ function getBatteryIndicator(callback, maxRetriesCallback) {
 		// Store the timeout ID so it can be removed later
 		let timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, retry_delay, () => {
 			getBatteryIndicator(callback, maxRetriesCallback);
-			// Since the function will be called again, we return false to remove the source
 			return GLib.SOURCE_REMOVE;
 		});
-		// Pass the timeout ID to the maxRetriesCallback so it can be cleared if needed
 		maxRetriesCallback(timeoutId);
 	} else {
 		console.error(`[battery-usage-wattmeter-extension] Failed to find power toggle indicator after ${max_retries} retries.`);
