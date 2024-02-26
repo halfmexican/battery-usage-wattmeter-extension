@@ -121,7 +121,7 @@ let BatLabelIndicator = GObject.registerClass(
 		_spawn() {
 			// Remove the existing timeout before creating a new one
 			if (this._biForceSync) {
-				GLib.source_remove(this._biForceSync);
+				GLib.Source.remove(this._biForceSync);
 				this._biForceSync = null;
 			}
 
@@ -135,7 +135,7 @@ let BatLabelIndicator = GObject.registerClass(
 		// Stop the update loop
 		_stop() {
 			if (this._biForceSync) {
-				GLib.source_remove(this._biForceSync);
+				GLib.Source.remove(this._biForceSync);
 				this._biForceSync = null;
 			}
 		}
@@ -159,7 +159,7 @@ export default class WattmeterExtension extends Extension {
 			},
 			(timeoutId) => {
 				if (this._batteryIndicatorTimeoutId) {
-					GLib.source_remove(this._batteryIndicatorTimeoutId);
+					GLib.Source.remove(this._batteryIndicatorTimeoutId);
 				}
 				this._batteryIndicatorTimeoutId = timeoutId;
 			}
@@ -173,7 +173,7 @@ export default class WattmeterExtension extends Extension {
 
 	disable() {
 		if (this._batteryIndicatorTimeoutId) {
-			GLib.source_remove(this._batteryIndicatorTimeoutId);
+			GLib.Source.remove(this._batteryIndicatorTimeoutId);
 			this._batteryIndicatorTimeoutId = null;
 		}
 		if (this._batLabelIndicator) {
