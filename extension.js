@@ -14,19 +14,19 @@ let retry_count = 0;
 const max_retries = 5;
 const retry_delay = 2000;
 let BatteryInfo = null;
+let batteryIndicatorTimeoutId = null;
 
-function getBatteryIndicator(callback, maxRetriesCallback) {
+function getBatteryIndicator(callback) {
 	let system = panel.statusArea?.quickSettings?._system;
 	if (system?._systemItem?._powerToggle) {
 		callback(system._systemItem._powerToggle._proxy, system);
 	} else if (retry_count < max_retries) {
 		retry_count++;
-		// Store the timeout ID so it can be removed later
-		let timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, retry_delay, () => {
-			getBatteryIndicator(callback, maxRetriesCallback);
+		if (batteryIndicatorTimeoutId) GLib.Source.remove(batteryIndicatorTimeoutId);
+		batteryIndicatorTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, retry_delay, () => {
+			getBatteryIndicator(callback);
 			return GLib.SOURCE_REMOVE;
 		});
-		maxRetriesCallback(timeoutId);
 	} else {
 		console.error(`[wattmeter-extension] Failed to find power toggle indicator after ${max_retries} retries.`);
 	}
@@ -45,7 +45,6 @@ function getBatteryPath(battery) {
 				return { "path": path, "isTP": readFileSafely(`${path}power_now`, "none") !== "none" };
 			}
 		}
-		// If none of the paths contain a valid file, return an error or a default path
 		console.error("[wattmeter-extension] No valid battery path found for automatic setting.");
 		return { "path": invalidPath, "isTP": false };
 	} else {
@@ -162,11 +161,6 @@ let BatLabelIndicator = GObject.registerClass(
 
 // Main extension class
 export default class WattmeterExtension extends Extension {
-	constructor(metadata) {
-		super(metadata);
-		this._batteryIndicatorTimeoutId = null; // Initialize the property for storing the timeout ID
-	}
-
 	enable() {
 		this._settings = this.getSettings("org.gnome.shell.extensions.battery_usage_wattmeter");
 
@@ -174,12 +168,6 @@ export default class WattmeterExtension extends Extension {
 		getBatteryIndicator(
 			(proxy, icon) => {
 				icon.add_child(this._batLabelIndicator);
-			},
-			(timeoutId) => {
-				if (this._batteryIndicatorTimeoutId) {
-					GLib.Source.remove(this._batteryIndicatorTimeoutId);
-				}
-				this._batteryIndicatorTimeoutId = timeoutId;
 			}
 		);
 		this._settings.connect("changed::battery", () => {
@@ -190,9 +178,9 @@ export default class WattmeterExtension extends Extension {
 	}
 
 	disable() {
-		if (this._batteryIndicatorTimeoutId) {
-			GLib.Source.remove(this._batteryIndicatorTimeoutId);
-			this._batteryIndicatorTimeoutId = null;
+		if (batteryIndicatorTimeoutId) {
+			GLib.Source.remove(batteryIndicatorTimeoutId);
+			batteryIndicatorTimeoutId = null;
 		}
 		if (this._batLabelIndicator) {
 			this._batLabelIndicator._stop();
