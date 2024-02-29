@@ -2,6 +2,10 @@
 
 ![Preview](https://github.com/halfmexican/battery-usage-wattmeter-extension/blob/main/preview.png)
 
+<a href="https://extensions.gnome.org/extension/6278/battery-usage-wattmeter/">
+    <img src="https://raw.githubusercontent.com/halfmexican/battery-usage-wattmeter-extension/main/get-it-on-ego.svg" alt="Get it on GNOME Extensions" height="100" align="middle">
+</a>
+
 ## Description
 
 The Battery Usage Wattmeter Extension is a GNOME extension that displays charging/discharging consumption in Watts next to the battery percentage level. It provides real-time information about your device's power usage. By default, it updates every 4 seconds and does not display consumption info when the battery is fully charged.
@@ -21,3 +25,4 @@ If you encounter any issues or have suggestions for improvements, please feel fr
 This extension is maintained by Jose H, with inspiration from the original [batt_consumption_wattmeter](https://github.com/wennaspeedy/batt_consumption_wattmetter) project.
 
 ---
+[ego] : https://extensions.gnome.org/extension/6278/battery-usage-wattmeter/
