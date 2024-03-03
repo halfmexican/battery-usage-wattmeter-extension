@@ -23,7 +23,7 @@ function getBatteryIndicator(callback) {
 	} else if (retry_count < max_retries) {
 		retry_count++;
 		if (batteryIndicatorTimeoutId) GLib.Source.remove(batteryIndicatorTimeoutId);
-		batteryIndicatorTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, retry_delay, () => {
+		batteryIndicatorTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, retry_delay, () => {
 			getBatteryIndicator(callback);
 			return GLib.SOURCE_REMOVE;
 		});
@@ -143,7 +143,7 @@ let BatLabelIndicator = GObject.registerClass(
 			}
 
 			this._biForceSync = GLib.timeout_add_seconds(
-				GLib.PRIORITY_DEFAULT,
+				GLib.PRIORITY_LOW,
 				this._settings.get_int("interval"),
 				this._sync.bind(this)
 			);
