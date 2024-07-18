@@ -46,7 +46,14 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
 			model: batteryStringList,
 		});
 		behaviorGroup.add(batteryRow);
-
 		window._settings.bind("battery", batteryRow, "selected", Gio.SettingsBindFlags.DEFAULT);
+
+		const hideNARow = new Adw.SwitchRow({
+			title: _("Hide N/A Status"),
+			subtitle: _("Hide the N/A status when battery is neither charging nor discharging"),
+		});
+		behaviorGroup.add(hideNARow);
+		window._settings.bind("hide-na", hideNARow, "active", Gio.SettingsBindFlags.DEFAULT);
+		
 	}
 }
