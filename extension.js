@@ -106,17 +106,18 @@ let BatLabelIndicator = GObject.registerClass(
 		// Determine battery status and power
 		_getBatteryStatus() {
 			const status = readFileSafely(BatteryInfo["path"] + "status", "Unknown");
-
+			const hideNA = this._settings.get_boolean("hide-na");
+		
 			if (status.includes("Full")) {
 				return "";  // Don't display anything if battery is full
 			}
-
+		
 			return status.includes("Charging") ? _(" +%s W ").format(this._meas()) :
 				status.includes("Discharging") ? _(" −%s W ").format(this._meas()) :
-					status.includes("Unknown") ? _(" ? ") :
-						_(" N/A ");
+				status.includes("Unknown") ? _(" ? ") :
+				(hideNA ? "" : _(" N/A "));
 		}
-
+		
 		// Convert power to string with appropriate formatting
 		_meas() {
 			const power = this._getPower();
