@@ -14,7 +14,7 @@
       <description></description>
   </key>
   <key name="hide-na" type="b">
-    <default>false</default>
+    <default>true</default>
     <summary>Hide N/A status</summary>
     <description>If true, hide the N/A status when the battery status is neither charging nor discharging.</description>
   </key>
