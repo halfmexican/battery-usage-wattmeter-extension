@@ -5,6 +5,7 @@ import {
 import {panel} from 'resource:///org/gnome/shell/ui/main.js';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
@@ -85,12 +86,23 @@ function getBatteryPath(battery) {
 
 // Read a file and return its contents or a default value
 function readFileSafely(filePath, defaultValue) {
-    try {
-        return Shell.get_file_contents_utf8_sync(filePath);
-    } catch (e) {
-        console.log(`Cannot read file ${filePath}: ${e}`);
-        return defaultValue;
-    }
+    return new Promise((resolve) => {
+        const file = Gio.File.new_for_path(filePath);
+        file.load_contents_async(null, (file, result) => {
+            try {
+                const [success, contents] = file.load_contents_finish(result);
+                if (success) {
+                    resolve(new TextDecoder().decode(contents));
+                } else {
+                    console.log(`Cannot read file ${filePath}: Load contents unsuccessful`);
+                    resolve(defaultValue);
+                }
+            } catch (e) {
+                console.log(`Cannot read file ${filePath}: ${e}`);
+                resolve(defaultValue);
+            }
+        });
+    });
 }
 
 // Indicator class
