@@ -31,6 +31,7 @@ function getBatteryIndicator(callback) {
             GLib.PRIORITY_LOW,
             retry_delay,
             () => {
+                Extension;
                 getBatteryIndicator(callback);
                 return GLib.SOURCE_REMOVE;
             }
@@ -44,8 +45,11 @@ function getBatteryIndicator(callback) {
 
 // Function to get the appropriate battery path and its type
 function getBatteryPath(battery) {
-    const useCustom = this._settings.get_boolean('use-custom');
-    const customPath = this._settings.get_string('custom-battery-path');
+    const settings = Extension.lookupByUUID(
+        'battery-usage-wattmeter@halfmexicanhalfamazing.gmail.com'
+    );
+    const useCustom = settings.get_boolean('use-custom');
+    const customPath = settings.get_string('custom-battery-path');
     // Array of possible battery paths
     const batteryPaths = [BAT0, BAT1, BAT2];
     const invalidPath = -1;
@@ -77,7 +81,6 @@ function getBatteryPath(battery) {
         let pathIndex = battery - 1;
         if (pathIndex >= 0 && pathIndex < batteryPaths.length) {
             let path = batteryPaths[pathIndex];
-            settin;
             if (readFileSafely(`${path}status`, 'none') !== 'none') {
                 return {
                     path: path,
