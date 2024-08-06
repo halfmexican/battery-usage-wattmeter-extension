@@ -9,16 +9,18 @@
       <description></description>
   </key>
     <key type="text" name="custom-battery-path">
-    <default></default>
-    <summary>File Path of battery</summary>
+      <default></default>
+      <summary>File Path of battery</summary>
+  </key>
     <key type="i" name="interval">
       <default>4</default>
       <summary></summary>
       <description></description>
   </key>
-    <key type="b" name="use-custom-battery">
+  <key type="b" name="use-custom">
     <default>false</default>
     <summary>Use custom battery path</summary>
+  </key>
   <key name="hide-na" type="b">
     <default>true</default>
     <summary>Hide N/A status</summary>
