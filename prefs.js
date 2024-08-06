@@ -76,5 +76,28 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
             'active',
             Gio.SettingsBindFlags.DEFAULT
         );
+        const customBatteryPathExpander = new Adw.ExpanderRow({
+            title: _('Custom Battery Path'),
+            subtitle: _('Leave empty to use default paths'),
+            show_enable_switch: true,
+        });
+        behaviorGroup.add(customBatteryPathExpander);
+
+        const customBatteryPathRow = new Adw.EntryRow();
+        customBatteryPathExpander.add_row(customBatteryPathRow);
+
+        window._settings.bind(
+            'use-custom-battery',
+            customBatteryPathExpander,
+            'enable-expansion',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
+        window._settings.bind(
+            'custom-battery-path',
+            customBatteryPathRow,
+            'text',
+            Gio.SettingsBindFlags.DEFAULT
+        );
     }
 }
