@@ -221,6 +221,17 @@ export default class WattmeterExtension extends Extension {
             BatteryInfo = getBatteryPath(newBatteryValue);
             this._batLabelIndicator._sync();
         });
+         this._settings.connect('changed::use-custom', () => {
+            let newBatteryValue = this._settings.get_string('custom-battery-path');
+            if (this._settings.get_boolean('use-custom')) {
+                BatteryInfo = getBatteryPath(newBatteryValue);
+                this._batLabelIndicator._sync();
+            } else {
+             let newBatteryValue = this._settings.get_int('battery');
+             BatteryInfo = getBatteryPath(newBatteryValue);
+             this._batLabelIndicator._sync();
+            }
+        });
     }
 
     disable() {
