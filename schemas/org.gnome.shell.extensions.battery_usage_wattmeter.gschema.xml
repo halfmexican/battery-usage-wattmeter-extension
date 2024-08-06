@@ -8,7 +8,7 @@
       <summary></summary>
       <description></description>
   </key>
-    <key type="text" name="custom-battery-path">
+    <key type="s" name="custom-battery-path">
       <default></default>
       <summary>File Path of battery</summary>
   </key>
