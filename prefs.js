@@ -78,7 +78,7 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
         );
         const customBatteryPathExpander = new Adw.ExpanderRow({
             title: _('Custom Battery Path'),
-            subtitle: _('Leave empty to use default paths'),
+            subtitle: _('Enter the path to your battery'),
             show_enable_switch: true,
         });
         behaviorGroup.add(customBatteryPathExpander);
