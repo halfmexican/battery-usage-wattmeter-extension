@@ -44,9 +44,18 @@ function getBatteryIndicator(callback) {
 
 // Function to get the appropriate battery path and its type
 function getBatteryPath(battery) {
+    const useCustom = this._settings.get_boolean('use-custom');
+    const customPath = this._settings.get_string('custom-battery-path');
     // Array of possible battery paths
     const batteryPaths = [BAT0, BAT1, BAT2];
     const invalidPath = -1;
+
+    if (useCustom && customPath) {
+        return {
+            path: customPath,
+            isTP: readFileSafely(`${customPath}/power_now`, 'none') !== 'none',
+        };
+    }
 
     if (battery === 0) {
         // Automatic setting
@@ -68,6 +77,7 @@ function getBatteryPath(battery) {
         let pathIndex = battery - 1;
         if (pathIndex >= 0 && pathIndex < batteryPaths.length) {
             let path = batteryPaths[pathIndex];
+            settin;
             if (readFileSafely(`${path}status`, 'none') !== 'none') {
                 return {
                     path: path,
