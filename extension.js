@@ -45,8 +45,11 @@ function getBatteryIndicator(callback) {
 
 // Function to get the appropriate battery path and its type
 function getBatteryPath(battery) {
-    const settings = Extension.lookupByUUID(
+    const extension = Extension.lookupByUUID(
         'battery-usage-wattmeter@halfmexicanhalfamazing.gmail.com'
+    );
+    const settings = extension.getSettings(
+        'org.gnome.shell.extensions.battery_usage_wattmeter'
     );
     const useCustom = settings.get_boolean('use-custom');
     const customPath = settings.get_string('custom-battery-path');
