@@ -86,7 +86,7 @@ function getBatteryPath(battery) {
 
 // Read a file and return its contents or a default value
 function readFileSafely(filePath, defaultValue) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         const file = Gio.File.new_for_path(filePath);
         file.load_contents_async(null, (file, result) => {
             try {
@@ -94,7 +94,9 @@ function readFileSafely(filePath, defaultValue) {
                 if (success) {
                     resolve(new TextDecoder().decode(contents));
                 } else {
-                    console.log(`Cannot read file ${filePath}: Load contents unsuccessful`);
+                    console.log(
+                        `Cannot read file ${filePath}: Load contents unsuccessful`
+                    );
                     resolve(defaultValue);
                 }
             } catch (e) {
