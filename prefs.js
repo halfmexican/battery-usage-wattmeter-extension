@@ -87,7 +87,7 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
         customBatteryPathExpander.add_row(customBatteryPathRow);
 
         window._settings.bind(
-            'use-custom-battery',
+            'use-custom',
             customBatteryPathExpander,
             'enable-expansion',
             Gio.SettingsBindFlags.DEFAULT
