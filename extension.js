@@ -4,6 +4,7 @@ import {
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 import {panel} from 'resource:///org/gnome/shell/ui/main.js';
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -83,15 +84,21 @@ function getBatteryPath(battery) {
     }
 }
 
-// Read a file and return its contents or a default value
 function readFileSafely(filePath, defaultValue) {
     try {
-        return Shell.get_file_contents_utf8_sync(filePath);
+        let file = Gio.File.new_for_path(filePath);
+        let [ok, contents] = file.load_contents(null);
+        if (ok) {
+            return String.fromCharCode.apply(null, contents);
+        } else {
+            return defaultValue;
+        }
     } catch (e) {
         console.log(`Cannot read file ${filePath}: ${e}`);
         return defaultValue;
     }
 }
+
 
 // Indicator class
 let BatLabelIndicator = GObject.registerClass(
