@@ -76,5 +76,32 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
             'active',
             Gio.SettingsBindFlags.DEFAULT
         );
+
+        // Add new SwitchRow for 'show-minus-sign'
+        const showMinusSignRow = new Adw.SwitchRow({
+            title: _('Show Minus Sign for Discharge'),
+            subtitle: _('Display a minus sign when discharging'),
+        });
+        behaviorGroup.add(showMinusSignRow);
+        window._settings.bind(
+            'show-minus-sign',
+            showMinusSignRow,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
+        // Add new SwitchRow for 'pad-single-digit'
+        const padSingleDigitRow = new Adw.SwitchRow({
+            title: _('Pad Single-Digit Power Draw'),
+            subtitle: _('Pad single-digit power draw with leading zero'),
+        });
+        behaviorGroup.add(padSingleDigitRow);
+        window._settings.bind(
+            'pad-single-digit',
+            padSingleDigitRow,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
     }
 }
+
