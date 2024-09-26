@@ -146,7 +146,7 @@ let BatLabelIndicator = GObject.registerClass(
 
     const powerDraw = this._meas();
     if (status.includes('Charging')) {
-        return showPlusSign ? _(' +%s W ').format(powerDraw) : _(' %s W ').format(powerDraw);
+        return  _(' +%s W ').format(powerDraw)
     } else if (status.includes('Discharging')) {
         return showMinusSign ? _(' -%s W ').format(powerDraw) : _(' %s W ').format(powerDraw);
     } else if (status.includes('Unknown')) {
