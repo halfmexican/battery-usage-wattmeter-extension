@@ -18,5 +18,15 @@
     <summary>Hide N/A status</summary>
     <description>If true, hide the N/A status when the battery status is neither charging nor discharging.</description>
   </key>
+    <key type="b" name="show-minus-sign">
+    <default>true</default>
+    <summary>Show minus sign for discharging</summary>
+    <description>Whether to display a minus sign before the power draw when discharging.</description>
+  </key>
+    <key type="b" name="pad-single-digit">
+      <default>true</default>
+      <summary>Pad single-digit power draw with leading zero</summary>
+      <description>Whether to pad single-digit power draw values with a leading zero.</description>
+    </key>
   </schema>
 </schemalist>

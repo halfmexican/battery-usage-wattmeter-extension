@@ -132,33 +132,39 @@ let BatLabelIndicator = GObject.registerClass(
         }
 
         // Determine battery status and power
-        _getBatteryStatus() {
-            const status = readFileSafely(
-                BatteryInfo['path'] + 'status',
-                'Unknown'
-            );
-            const hideNA = this._settings.get_boolean('hide-na');
+       _getBatteryStatus() {
+    const status = readFileSafely(
+        BatteryInfo['path'] + 'status',
+        'Unknown'
+    );
+    const hideNA = this._settings.get_boolean('hide-na');
+    const showMinusSign = this._settings.get_boolean('show-minus-sign');
 
-            if (status.includes('Full')) {
-                return ''; // Don't display anything if battery is full
-            }
+    if (status.includes('Full')) {
+        return ''; // Don't display anything if battery is full
+    }
 
-            return status.includes('Charging')
-                ? _(' +%s W ').format(this._meas())
-                : status.includes('Discharging')
-                  ? _(' −%s W ').format(this._meas())
-                  : status.includes('Unknown')
-                    ? _(' ? ')
-                    : hideNA
-                      ? ''
-                      : _(' N/A ');
-        }
+    const powerDraw = this._meas();
+    if (status.includes('Charging')) {
+        return  _(' +%s W ').format(powerDraw);
+    } else if (status.includes('Discharging')) {
+        return showMinusSign ? _(' -%s W ').format(powerDraw) : _(' %s W ').format(powerDraw);
+    } else if (status.includes('Unknown')) {
+        return _(' ? ');
+    } else {
+        return hideNA ? '' : _(' N/A ');
+    }
+}
+
 
         // Convert power to string with appropriate formatting
-        _meas() {
-            const power = this._getPower();
-            return power < 0 ? 0 : String(Math.round(power)).padStart(2, '0');
-        }
+ _meas() {
+    const power = this._getPower();
+    const padSingleDigit = this._settings.get_boolean('pad-single-digit');
+    const powerValue = power < 0 ? 0 : Math.round(power);
+    return padSingleDigit ? String(powerValue).padStart(2, '0') : String(powerValue);
+}
+
 
         // Update the indicator label
         _sync() {
