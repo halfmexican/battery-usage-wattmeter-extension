@@ -13,6 +13,7 @@ import Clutter from 'gi://Clutter';
 const BAT0 = '/sys/class/power_supply/BAT0/';
 const BAT1 = '/sys/class/power_supply/BAT1/';
 const BAT2 = '/sys/class/power_supply/BAT2/';
+const SBS0 = '/sys/class/power_supply/sbs-5-000b/';
 
 let retry_count = 0;
 const max_retries = 5;
@@ -46,7 +47,7 @@ function getBatteryIndicator(callback) {
 // Function to get the appropriate battery path and its type
 function getBatteryPath(battery) {
     // Array of possible battery paths
-    const batteryPaths = [BAT0, BAT1, BAT2];
+    const batteryPaths = [BAT0, BAT1, BAT2, SBS0];
     const invalidPath = -1;
 
     if (battery === 0) {
@@ -161,7 +162,7 @@ let BatLabelIndicator = GObject.registerClass(
  _meas() {
     const power = this._getPower();
     const padSingleDigit = this._settings.get_boolean('pad-single-digit');
-    const powerValue = power < 0 ? 0 : Math.round(power);
+    const powerValue = Math.round(power < 0 ? -power : power);
     return padSingleDigit ? String(powerValue).padStart(2, '0') : String(powerValue);
 }
 
