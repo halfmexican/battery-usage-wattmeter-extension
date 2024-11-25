@@ -48,7 +48,7 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
 
         // Create a StringList and populate it with battery options
         const batteryStringList = new Gtk.StringList();
-        batteryStringList.splice(0, 0, ['Automatic', 'BAT0', 'BAT1', 'BAT2']);
+        batteryStringList.splice(0, 0, ['Automatic', 'BAT0', 'BAT1', 'BAT2', 'SBS0']);
 
         // Create a ComboRow for the 'battery' setting
         const batteryRow = new Adw.ComboRow({
