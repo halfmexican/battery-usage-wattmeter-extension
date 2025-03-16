@@ -63,6 +63,19 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
             Gio.SettingsBindFlags.DEFAULT
         );
 
+        // Add new SwitchRow for 'combine-batteries'
+        const combineBatteriesRow = new Adw.SwitchRow({
+            title: _('Combine Battery Readings'),
+            subtitle: _('Sum the power readings from all batteries'),
+        });
+        behaviorGroup.add(combineBatteriesRow);
+        window._settings.bind(
+            'combine-batteries',
+            combineBatteriesRow,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
         const hideNARow = new Adw.SwitchRow({
             title: _('Hide N/A Status'),
             subtitle: _(

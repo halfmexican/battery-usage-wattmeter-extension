@@ -117,13 +117,33 @@ let BatLabelIndicator = GObject.registerClass(
 
         // Get power consumption in Watts
         _getPower() {
-            const path = BatteryInfo['path'];
-            if (!BatteryInfo['isTP']) {
-                const current_now = this._getValue(`${path}current_now`);
-                const voltage_now = this._getValue(`${path}voltage_now`);
-                return current_now * voltage_now;
+            if (this._settings.get_boolean('combine-batteries')) {
+                let total = 0;
+                const batteryPaths = [BAT0, BAT1, BAT2, SBS0];
+                for (let path of batteryPaths) {
+                    if (readFileSafely(`${path}status`, 'none') !== 'none') {
+                        let reading;
+                        if (readFileSafely(`${path}power_now`, 'none') !== 'none') {
+                            reading = this._getValue(`${path}power_now`);
+                        } else {
+                            const current_now = this._getValue(`${path}current_now`);
+                            const voltage_now = this._getValue(`${path}voltage_now`);
+                            reading = current_now * voltage_now;
+                        }
+                        if (reading !== -1)
+                            total += reading;
+                    }
+                }
+                return total;
+            } else {
+                const path = BatteryInfo['path'];
+                if (!BatteryInfo['isTP']) {
+                    const current_now = this._getValue(`${path}current_now`);
+                    const voltage_now = this._getValue(`${path}voltage_now`);
+                    return current_now * voltage_now;
+                }
+                return this._getValue(`${path}power_now`);
             }
-            return this._getValue(`${path}power_now`);
         }
 
         // Helper function to get the value from a sysfs file
