@@ -13,6 +13,11 @@
       <summary></summary>
       <description></description>
   </key>
+  <key type="b" name="combine-batteries">
+    <default>false</default>
+    <summary>Combine Battery Readings</summary>
+    <description>If true, sum the power readings from all available batteries.</description>
+  </key>
   <key name="hide-na" type="b">
     <default>true</default>
     <summary>Hide N/A status</summary>
