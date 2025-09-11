@@ -14,6 +14,7 @@ const BAT0 = '/sys/class/power_supply/BAT0/';
 const BAT1 = '/sys/class/power_supply/BAT1/';
 const BAT2 = '/sys/class/power_supply/BAT2/';
 const SBS0 = '/sys/class/power_supply/sbs-5-000b/';
+const macsmc = '/sys/class/power_supply/macsmc-battery/';
 
 let retry_count = 0;
 const max_retries = 5;
@@ -47,7 +48,7 @@ function getBatteryIndicator(callback) {
 // Function to get the appropriate battery path and its type
 function getBatteryPath(battery) {
     // Array of possible battery paths
-    const batteryPaths = [BAT0, BAT1, BAT2, SBS0];
+    const batteryPaths = [BAT0, BAT1, BAT2, SBS0, macsmc];
     const invalidPath = -1;
 
     if (battery === 0) {
@@ -119,7 +120,7 @@ let BatLabelIndicator = GObject.registerClass(
         _getPower() {
             if (this._settings.get_boolean('combine-batteries')) {
                 let total = 0;
-                const batteryPaths = [BAT0, BAT1, BAT2, SBS0];
+                const batteryPaths = [BAT0, BAT1, BAT2, SBS0, macsmc];
                 for (let path of batteryPaths) {
                     if (readFileSafely(`${path}status`, 'none') !== 'none') {
                         let reading;
