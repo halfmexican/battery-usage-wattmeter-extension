@@ -32,7 +32,7 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
             title: _('Sync Interval'),
             subtitle: _('Seconds'),
             adjustment: new Gtk.Adjustment({
-                lower: 0,
+                lower: 1,
                 upper: 120,
                 step_increment: 1,
                 value: 4,
