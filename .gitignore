@@ -1,0 +1,4 @@
+.vscode
+.prettierrc.yml
+.eslintrc.yml
+/schemas/gschemas.compiled
