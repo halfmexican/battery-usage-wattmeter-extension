@@ -10,8 +10,9 @@
   </key>
     <key type="i" name="interval">
       <default>4</default>
-      <summary></summary>
-      <description></description>
+      <range min="1" max="120"/>
+      <summary>Sync interval</summary>
+      <description>How often, in seconds, the power draw is re-read from sysfs.</description>
   </key>
   <key type="b" name="combine-batteries">
     <default>false</default>
