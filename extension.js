@@ -17,6 +17,7 @@ const BATTERY_PATHS = [
     '/sys/class/power_supply/BAT2/',
     '/sys/class/power_supply/sbs-5-000b/',
     '/sys/class/power_supply/macsmc-battery/',
+    '/sys/class/power_supply/qcom-battmgr-bat/',
 ];
 
 const SETTINGS_SCHEMA = 'org.gnome.shell.extensions.battery_usage_wattmeter';
