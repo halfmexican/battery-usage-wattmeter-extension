@@ -34,5 +34,10 @@
       <summary>Pad single-digit power draw with leading zero</summary>
       <description>Whether to pad single-digit power draw values with a leading zero.</description>
     </key>
+    <key type="b" name="show-decimal">
+      <default>false</default>
+      <summary>Shows the decimal place</summary>
+      <description>Whether to round or display the decimal place.</description>
+    </key>
   </schema>
 </schemalist>
