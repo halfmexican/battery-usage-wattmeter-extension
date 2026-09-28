@@ -133,7 +133,13 @@ const BatLabelIndicator = GObject.registerClass(
             if (power === null)
                 return null;
 
-            const value = String(Math.round(Math.abs(power)));
+            let value = power
+            if (this._settings.get_boolean('show-decimal')) {
+                value = String( Math.abs(power).toFixed(1))
+            } else {
+                value = String(Math.round(Math.abs(power)));
+            }
+
             return this._settings.get_boolean('pad-single-digit')
                 ? value.padStart(2, '0')
                 : value;

@@ -115,6 +115,19 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
             'active',
             Gio.SettingsBindFlags.DEFAULT
         );
+
+        // Add new SwitchRow for 'show-decimal'
+        const showDecimalRow = new Adw.SwitchRow({
+            title: _('Show Decimal Place')
+        });
+
+        behaviorGroup.add(showDecimalRow);
+        window._settings.bind(
+            'show-decimal',
+            showDecimalRow,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
     }
 }
 
