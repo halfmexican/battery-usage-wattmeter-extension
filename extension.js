@@ -232,12 +232,12 @@ export default class WattmeterExtension extends Extension {
     }
 
     _addToPanel() {
-        const system = panel.statusArea.quickSettings._system;
+        const system = panel.statusArea.quickSettings?._system;
 
-        if (system._systemItem._powerToggle) {
+        if (system?._systemItem?._powerToggle) {
             system.add_child(this._indicator);
             return;
-        }
+         }
         // The quick settings system indicator is not guaranteed to exist yet when
         // the extension is enabled during shell startup, so retry a few times.
 	    if (this._retries >= MAX_RETRIES) {
