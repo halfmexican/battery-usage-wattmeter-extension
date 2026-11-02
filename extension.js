@@ -75,6 +75,8 @@ class BatLabelIndicator extends St.Label {
             'changed::hide-na', () => this._sync(),
             'changed::show-minus-sign', () => this._sync(),
             'changed::pad-single-digit', () => this._sync(),
+            'changed::show-decimal', () => this._sync(),
+            'changed::show-time-remaining', () => this._sync(),
             this
         );
 
