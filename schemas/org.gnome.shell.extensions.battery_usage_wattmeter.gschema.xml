@@ -39,5 +39,10 @@
       <summary>Shows the decimal place</summary>
       <description>Whether to round or display the decimal place.</description>
     </key>
+    <key type="b" name="show-time-remaining">
+      <default>false</default>
+      <summary>Shows time remaining</summary>
+      <description> Whether to show the estimated time remaining or time to full alongside the power draw.</description>
+    </key>
   </schema>
 </schemalist>

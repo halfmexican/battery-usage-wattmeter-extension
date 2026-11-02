@@ -20,6 +20,7 @@ const BATTERY_PATHS = [
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 2;
 const MIN_INTERVAL = 1;
+const AVG_BUFFER_SIZE = 10;
 
 async function readFileSafely(filePath) {
     try {
@@ -67,6 +68,7 @@ class BatLabelIndicator extends St.Label {
         this._settings = settings;
         this._timeoutId = null;
         this._battery = {path: null, hasPowerNow: false};
+        this._powerBuffer = [];
 
         this._settings.connectObject(
             'changed::battery', () => this._onBatteryChanged(),
@@ -75,6 +77,8 @@ class BatLabelIndicator extends St.Label {
             'changed::hide-na', () => this._sync(),
             'changed::show-minus-sign', () => this._sync(),
             'changed::pad-single-digit', () => this._sync(),
+            'changed::show-decimal', () => this._sync(),
+            'changed::show-time-remaining', () => this._sync(),
             this
         );
 
@@ -91,7 +95,6 @@ class BatLabelIndicator extends St.Label {
         return Number.isFinite(value) ? value / 1000000 : null;
     }
 
-    // Power draw of a single battery in Watts, or null if unavailable.
     async _powerAt(path, hasPowerNow) {
         if (hasPowerNow)
             return this._read(`${path}power_now`);
@@ -105,7 +108,7 @@ class BatLabelIndicator extends St.Label {
         return current * voltage;
     }
 
-    async _getPower() {
+    async _getRawPower() {
         if (!this._settings.get_boolean('combine-batteries')) {
             if (!this._battery.path)
                 return null;
@@ -134,6 +137,18 @@ class BatLabelIndicator extends St.Label {
         return total;
     }
 
+    async _getPower() {
+        const raw = await this._getRawPower();
+        if (raw === null)
+            return null;
+
+        this._powerBuffer.push(raw);
+        if (this._powerBuffer.length > AVG_BUFFER_SIZE)
+            this._powerBuffer.shift();
+
+        const sum = this._powerBuffer.reduce((a, b) => a + b, 0);
+        return sum / this._powerBuffer.length;
+    }
     // Power draw formatted for display, or null if it cannot be read.
     async _meas() {
         const power = await this._getPower();
@@ -151,6 +166,78 @@ class BatLabelIndicator extends St.Label {
             : value;
     }
 
+    async _energyAt(path, key) {
+        const energyKey = key === 'now' ? 'energy_now' : 'energy_full';
+        const chargeKey = key === 'now' ? 'charge_now' : 'charge_full';
+
+        let energy = await this._read(`${path}${energyKey}`);
+        if (energy !== null)
+            return energy;
+
+        const charge = await this._read(`${path}${chargeKey}`);
+        const voltage = await this._read(`${path}voltage_now`);
+        if (charge !== null && voltage !== null)
+            return charge * voltage;
+
+        return null;
+    }
+
+    async _getTimeRemaining(status) {
+        const power = await this._getPower();
+        if (!power || power === 0)
+            return '';
+
+        const draw = Math.abs(power);
+        let energyNow = null;
+        let energyFull = null;
+
+        if (this._settings.get_boolean('combine-batteries')) {
+            let totalNow = null;
+            let totalFull = null;
+
+            const results = await Promise.all(BATTERY_PATHS.map(async path => {
+                if (!path) return null;
+                const pStatus = await readFileSafely(`${path}status`);
+                if (pStatus === null) return null;
+
+                return {
+                    now: await this._energyAt(path, 'now'),
+                    full: status.includes('Charging') ? await this._energyAt(path, 'full') : null
+                };
+            }));
+
+            for (const reading of results) {
+                if (reading !== null) {
+                    if (reading.now !== null) totalNow = (totalNow ?? 0) + reading.now;
+                    if (reading.full !== null) totalFull = (totalFull ?? 0) + reading.full;
+                }
+            }
+            energyNow = totalNow;
+            energyFull = totalFull;
+        } else {
+            if (!this._battery.path) return '';
+            energyNow = await this._energyAt(this._battery.path, 'now');
+            if (status.includes('Charging'))
+                energyFull = await this._energyAt(this._battery.path, 'full');
+        }
+
+        let hours = null;
+        if (status.includes('Discharging') && energyNow !== null) {
+            hours = energyNow / draw;
+        } else if (status.includes('Charging') && energyNow !== null && energyFull !== null) {
+            hours = (energyFull - energyNow) / draw;
+        }
+
+        if (hours !== null && hours > 0) {
+            let m = Math.round(hours * 60);
+            const h = Math.floor(m / 60);
+            m = m % 60;
+            return h > 0 ? ` ~${h}:${String(m).padStart(2, '0')}` : ` ~${m}m`;
+        }
+
+        return '';
+    }
+
     async _getBatteryStatus() {
         const status = (await readFileSafely(`${this._battery.path}status`)) ?? 'Unknown';
         const naText = this._settings.get_boolean('hide-na') ? '' : _(' N/A ');
@@ -165,13 +252,17 @@ class BatLabelIndicator extends St.Label {
         if (powerDraw === null)
             return naText;
 
+        let timeStr = '';
+        if (this._settings.get_boolean('show-time-remaining'))
+            timeStr = await this._getTimeRemaining(status);
+
         if (status.includes('Charging'))
-            return _(' +%s W ').format(powerDraw);
+            return _(' +%s W%s ').format(powerDraw, timeStr);
 
         if (status.includes('Discharging')) {
             return this._settings.get_boolean('show-minus-sign')
-                ? _(' -%s W ').format(powerDraw)
-                : _(' %s W ').format(powerDraw);
+                ? _(' -%s W%s ').format(powerDraw, timeStr)
+                : _(' %s W%s ').format(powerDraw, timeStr);
         }
 
         return naText;
@@ -179,13 +270,14 @@ class BatLabelIndicator extends St.Label {
 
     async _onBatteryChanged() {
         this._battery = await findBattery(this._settings.get_int('battery'));
+        this._powerBuffer = [];
         this._sync();
     }
 
     async _sync() {
         if (!this._settings)
             return;
-        	// Re-probe when nothing was found yet: sysfs entries can appear
+        // Re-probe when nothing was found yet: sysfs entries can appear
         // late, and batteries can be hot-plugged.
         if (!this._battery.path)
             this._battery = await findBattery(this._settings.get_int('battery'));
@@ -216,6 +308,7 @@ class BatLabelIndicator extends St.Label {
 
         this._settings.disconnectObject(this);
         this._settings = null;
+        this._powerBuffer = null;
 
         super.destroy();
     }
@@ -240,12 +333,12 @@ export default class WattmeterExtension extends Extension {
          }
         // The quick settings system indicator is not guaranteed to exist yet when
         // the extension is enabled during shell startup, so retry a few times.
-	    if (this._retries >= MAX_RETRIES) {
-	        console.warn(
-	            `[wattmeter-extension] Failed to find power toggle indicator after ${MAX_RETRIES} retries.`
-	        );
-	        return;
-	    }
+	      if (this._retries >= MAX_RETRIES) {
+	          console.warn(
+	              `[wattmeter-extension] Failed to find power toggle indicator after ${MAX_RETRIES} retries.`
+	          );
+	          return;
+	      }
 
         this._retries++;
         this._retryId = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, RETRY_DELAY, () => {
