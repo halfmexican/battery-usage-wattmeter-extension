@@ -128,6 +128,18 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
             'active',
             Gio.SettingsBindFlags.DEFAULT
         );
+
+        const showTimeRemainingRow = new Adw.SwitchRow({
+            title: _('Show Time Remaining'),
+            subtitle: _('Display estimated time remaining or time to full'),
+        });
+        behaviorGroup.add(showTimeRemainingRow);
+        window._settings.bind(
+            'show-time-remaining',
+            showTimeRemainingRow,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
     }
 }
 
